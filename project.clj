@@ -10,7 +10,8 @@
                  [http-kit "2.0.0"]
                  [ring.middleware.logger "0.4.0"]
                  [hiccup "1.0.5"]
-                 [com.novemberain/monger "1.7.0"]]
+                 [com.novemberain/monger "1.7.0"]
+                 [prismatic/dommy "0.1.2"]]
   :plugins [[lein-cljsbuild "1.0.0"]]
   :cljsbuild {:builds
               [{:source-paths ["src/cljs"]

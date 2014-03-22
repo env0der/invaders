@@ -5,4 +5,4 @@
 (defn render []
   (layout/common "Invaders"
                  [:script {:src "js/build/invaders.js"}]
-                 [:div "We came in peace!"]))
+                 [:canvas#gamefield {:height 500 :width 1000}]))
