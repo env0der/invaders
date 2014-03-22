@@ -10,3 +10,5 @@ pom.xml.asc
 /.nrepl-port
 /logs/*.log
 /resources/public/build/*
+/out
+/repl

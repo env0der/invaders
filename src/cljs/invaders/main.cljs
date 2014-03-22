@@ -1,3 +1,6 @@
-(ns invaders.client.main)
+(ns invaders.client.main
+  (:require [clojure.browser.repl :as repl]))
 
-(.write js/document "Hello, ClojureScript!")
+(repl/connect "http://localhost:9000/repl")
+
+(.write js/document "Invaders from ClojureScript!")

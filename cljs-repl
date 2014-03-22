@@ -1,0 +1,3 @@
+#!/bin/zsh
+
+lein trampoline cljsbuild repl-listen
