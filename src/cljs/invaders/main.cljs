@@ -45,7 +45,7 @@
 
 (set! (.-onload js/window) init)
 
-(:require [clojure.browser.repl :as repl]))
+(:require [clojure.browser.repl :as repl])
 
 (repl/connect "http://localhost:9000/repl")
 
