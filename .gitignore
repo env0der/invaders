@@ -9,6 +9,6 @@ pom.xml.asc
 /.lein-*
 /.nrepl-port
 /logs/*.log
-/resources/public/build/*
+/resources/public/js/build/*
 /out
 /repl
