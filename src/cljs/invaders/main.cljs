@@ -44,3 +44,9 @@
       (load-images-and-do (fn [resources] (draw-grid context resources game-map))))))
 
 (set! (.-onload js/window) init)
+
+(:require [clojure.browser.repl :as repl]))
+
+(repl/connect "http://localhost:9000/repl")
+
+(.write js/document "Invaders from ClojureScript!")
