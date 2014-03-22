@@ -4,4 +4,5 @@
 
 (defn render []
   (layout/common "Invaders"
+                 [:script {:src "js/invaders.js"}]
                  [:div "We came in peace!"]))
