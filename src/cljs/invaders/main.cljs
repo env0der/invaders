@@ -63,11 +63,11 @@
     (add-sprite-to-stage sprite)
     (set-sprite-position sprite (+ (* (mod y 2) 40) (* 80 x)) (* 50 y))))
 
-(defn draw-grid [game-map]
-  (let [grid (game-map-to-grid game-map)]
-    (doseq [cell grid]
-      (draw-tile ((:type cell) tiles-textures) (:x cell) (:y cell)))))
+(defn draw-grid [grid]
+  (doseq [cell grid]
+    (draw-tile ((:type cell) tiles-textures) (:x cell) (:y cell))))
 
-(draw-grid game-map)
+;; TODO: it would be better to draw a pre-rendered map image instead of drawing it cell by cell
+(draw-grid (game-map-to-grid game-map))
 
 (defn update-world [])
