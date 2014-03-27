@@ -4,5 +4,5 @@
 
 (defn render []
   (layout/common "Invaders"
-                 [:script {:src "js/build/invaders.js"}]
-                 [:canvas#gamefield {:height 500 :width 1000}]))
+                 [:script {:src "js/vendor/pixi.js"}]
+                 [:script {:src "js/build/invaders.js"}]))

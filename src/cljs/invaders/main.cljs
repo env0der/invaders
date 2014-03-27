@@ -2,51 +2,72 @@
   (:use-macros
    [dommy.macros :only [node sel sel1]])
   (:require
-   [dommy.core :as dommy]))
+   [dommy.core :as dommy]
+   [clojure.browser.repl :as repl]))
+
+(repl/connect "http://localhost:9000/repl")
+
+
+;; sprite functions
+
+(defn create-sprite [texture]
+  (js/PIXI.Sprite. texture))
+
+(defn create-texture [path]
+  (js/PIXI.Texture.fromImage path))
+
+(defn set-sprite-position [sprite x y]
+  (set! (.-position.x sprite) x)
+  (set! (.-position.y sprite) y))
+
+(defn add-sprite-to-stage [sprite]
+  (. stage addChild sprite))
+
+
+;; setup and rendering loop
+
+(def stage (js/PIXI.Stage. 0xaaaaaa))
+(def renderer (js/PIXI.autoDetectRenderer 1000 500))
+(.appendChild (.-body js/document) (.-view renderer))
+
+(defn render-stage []
+  (js/requestAnimFrame render-stage)
+  (update-world)
+  (. renderer render stage))
+
+(js/requestAnimFrame render-stage)
+
+
+;; drawing game map
+(def tiles-textures {:w (create-texture "/images/water.png")
+                     :g (create-texture "/images/grass.png")})
 
 (def game-map [
- [:g :g :g :g :g :g :g :g :g]
- [:g :g :g :g :g :w :w :w :g]
- [:g :g :g :g :g :w :w :w :g]
- [:w :w :g :g :g :w :w :g :g]
- [:w :w :g :g :g :g :g :g :g]
- [:g :g :g :g :w :g :g :g :g]
- [:g :g :g :g :g :w :g :g :g]
- [:g :g :g :g :g :w :w :g :g]
- ])
+               [:g :g :g :g :g :g :g :g :g]
+               [:g :g :g :g :g :w :w :w :g]
+               [:g :g :g :g :g :w :w :w :g]
+               [:w :w :g :g :g :w :w :g :g]
+               [:w :w :g :g :g :g :g :g :g]
+               [:g :g :g :g :w :g :g :g :g]
+               [:g :g :g :g :g :w :g :g :g]
+               [:g :g :g :g :g :w :w :g :g]
+               ])
 
-(defn transform-map [game-map]
+(defn game-map-to-grid [game-map]
   (vec (flatten (map-indexed (fn [y v]
                                (map-indexed (fn [x type] {:x x :y y :type type}) v)
                                ) game-map))))
 
-(defn load-images-and-do [callback]
-  (let [grass (new js/Image)]
-    (set! (.-src grass) "/images/grass.png")
-    (set! (.-onload grass) (fn []
-                             (let [water (new js/Image)]
-                               (set! (.-src water) "/images/water.png")
-                               (set! (.-onload water) #(callback {:w water :g grass})))
-                             ))))
+(defn draw-tile [texture x y]
+  (let [sprite (create-sprite texture)]
+    (add-sprite-to-stage sprite)
+    (set-sprite-position sprite (+ (* (mod y 2) 40) (* 80 x)) (* 50 y))))
 
-(defn draw-cell [context img x y]
-  (.drawImage context img (+ (* (mod y 2) 40) (* 80 x)) (* 50 y)))
-
-(defn draw-grid [context resources game-map]
-  (let [grid (transform-map game-map)]
+(defn draw-grid [game-map]
+  (let [grid (game-map-to-grid game-map)]
     (doseq [cell grid]
-      (draw-cell context ((:type cell) resources) (:x cell) (:y cell)))
-    ))
+      (draw-tile ((:type cell) tiles-textures) (:x cell) (:y cell)))))
 
-(defn init[]
-  (let [canvas (sel1 :#gamefield)]
-    (let [context (.getContext canvas "2d")]
-      (load-images-and-do (fn [resources] (draw-grid context resources game-map))))))
+(draw-grid game-map)
 
-(set! (.-onload js/window) init)
-
-(:require [clojure.browser.repl :as repl])
-
-(repl/connect "http://localhost:9000/repl")
-
-(.write js/document "Invaders from ClojureScript!")
+(defn update-world [])
