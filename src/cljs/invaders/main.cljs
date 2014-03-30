@@ -42,6 +42,8 @@
 (def tiles-textures {:w (create-texture "/images/water.png")
                      :g (create-texture "/images/grass.png")})
 
+(def units-textures {:marsman (create-texture "/images/marsman.png")})
+
 (def game-map [
                [:g :g :g :g :g :g :g :g :g]
                [:g :g :g :g :g :w :w :w :g]
@@ -58,6 +60,12 @@
                                (map-indexed (fn [x type] {:x x :y y :type type}) v)
                                ) game-map))))
 (def ui-state (atom {}))
+(def game-state (atom {:units {
+                               1 {:type :marsman :x 3 :y 4}
+                               2 {:type :marsman :x 2 :y 4}
+                               3 {:type :marsman :x 3 :y 2}
+                               4 {:type :marsman :x 2 :y 3}
+                       }}))
 
 (defn highlight-tile [tile tint]
   (set! (.-tint tile) tint))
@@ -81,7 +89,18 @@
   (doseq [cell grid]
     (draw-tile ((:type cell) tiles-textures) (:x cell) (:y cell))))
 
+(defn draw-units [units]
+  (doseq [unit (vals (:units @game-state))]
+    (let [sprite (create-sprite ((:type unit) units-textures))]
+      (add-sprite-to-stage sprite)
+      (set-unit-position sprite (:x unit) (:y unit)))))
+
+(defn set-unit-position [unit x y]
+  (set-sprite-position unit
+                       (+ (* (mod y 2) 40) 40 (* 80 x)) (+ 10 (* 50 y))))
+
 ;; TODO: it would be better to draw a pre-rendered map image instead of drawing it cell by cell
 (draw-grid (game-map-to-grid game-map))
+(draw-units (:units @game-state))
 
 (defn update-world [])
