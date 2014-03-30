@@ -57,10 +57,24 @@
   (vec (flatten (map-indexed (fn [y v]
                                (map-indexed (fn [x type] {:x x :y y :type type}) v)
                                ) game-map))))
+(def ui-state (atom {}))
+
+(defn highlight-tile [tile tint]
+  (set! (.-tint tile) tint))
+
+(defn remove-tile-highlight [tile]
+  (highlight-tile tile 0xFFFFFF))
 
 (defn draw-tile [texture x y]
   (let [sprite (create-sprite texture)]
     (add-sprite-to-stage sprite)
+    (set! (.-interactive sprite) true)
+    (set! (.-click sprite) (fn [clickData]
+                             (let [selected-tile (:selected-tile @ui-state)]
+                               (if selected-tile
+                                 (remove-tile-highlight selected-tile)))
+                             (highlight-tile sprite 0xBBBBBB)
+                             (swap! ui-state assoc :selected-tile sprite)))
     (set-sprite-position sprite (+ (* (mod y 2) 40) (* 80 x)) (* 50 y))))
 
 (defn draw-grid [grid]
