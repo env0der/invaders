@@ -4,60 +4,15 @@
   (:require
    [dommy.core :as dommy]
    [clojure.browser.repl :as repl]
-   [invaders.client.maps :as maps]))
+   [invaders.client.maps :as maps]
+   [invaders.client.stage :as stage]
+   [invaders.client.textures :as textures]))
 
 (repl/connect "http://localhost:9000/repl")
+
 (defn log [& items]
   (.log js/console (apply str items)))
 
-;; sprite functions
-
-(defn create-sprite [texture]
-  (js/PIXI.Sprite. texture))
-
-(defn create-texture [path]
-  (js/PIXI.Texture.fromImage path))
-
-(defn set-sprite-position [sprite x y]
-  (set! (.-position.x sprite) x)
-  (set! (.-position.y sprite) y))
-
-(defn add-sprite-to-stage [sprite]
-  (. stage addChild sprite))
-
-
-;;setup stats monitor
-(def stats (js/Stats.))
-(set! (-> (.-domElement stats) .-style .-position) "absolute")
-(set! (-> (.-domElement stats) .-style .-display) "inline-block")
-(set! (-> (.-domElement stats) .-style .-top) "0px")
-(set! (-> (.-domElement stats) .-style .-right) "0px")
-
-;; setup and rendering loop
-(def stage (js/PIXI.Stage. 0xE3FCFF))
-(def renderer (js/PIXI.autoDetectRenderer (.-innerWidth js/window) (.-innerHeight js/window)))
-
-(.appendChild (.-body js/document) (.-view renderer))
-(.appendChild (.-body js/document) (.-domElement stats))
-
-
-(defn render-stage []
-  (js/requestAnimFrame render-stage)
-  (.begin stats)
-  (update-world)
-  (.end stats)
-  (. renderer render stage))
-
-(js/requestAnimFrame render-stage)
-
-
-;; drawing game map
-(def tiles-textures {:w (create-texture "/images/water.png")
-                     :g (create-texture "/images/grass.png")
-                     :s (create-texture "/images/sand.png")
-                     })
-
-(def units-textures {:marsman (create-texture "/images/marsman.png")})
 
 (def game-map (:clearshore maps/maps))
 
@@ -80,8 +35,8 @@
   (highlight-tile tile 0xFFFFFF))
 
 (defn draw-tile [texture x y]
-  (let [sprite (create-sprite texture)]
-    (add-sprite-to-stage sprite)
+  (let [sprite (stage/create-sprite texture)]
+    (stage/add-sprite-to-stage sprite)
     (set! (.-interactive sprite) true)
     (set! (.-click sprite) (fn [clickData]
                              (let [selected-tile (:selected-tile @ui-state)]
@@ -89,24 +44,24 @@
                                  (remove-tile-highlight selected-tile)))
                              (highlight-tile sprite 0xBBBBBB)
                              (swap! ui-state assoc :selected-tile sprite)))
-    (set-sprite-position sprite (+ (* (mod y 2) 40) (* 80 x)) (* 50 y))))
+    (stage/set-sprite-position sprite (+ (* (mod y 2) 40) (* 80 x)) (* 50 y))))
 
 (defn draw-grid [grid]
   (doseq [cell grid]
-    (draw-tile ((:type cell) tiles-textures) (:x cell) (:y cell))))
+    (draw-tile ((:type cell) textures/tiles-textures) (:x cell) (:y cell))))
+
+(defn set-unit-position [unit x y]
+  (stage/set-sprite-position unit
+                             (+ (* (mod y 2) 40) 40 (* 80 x)) (+ 10 (* 50 y))))
 
 (defn draw-units [units]
   (doseq [unit (vals (:units @game-state))]
-    (let [sprite (create-sprite ((:type unit) units-textures))]
-      (add-sprite-to-stage sprite)
+    (let [sprite (stage/create-sprite ((:type unit) textures/units-textures))]
+      (stage/add-sprite-to-stage sprite)
       (set-unit-position sprite (:x unit) (:y unit)))))
-
-(defn set-unit-position [unit x y]
-  (set-sprite-position unit
-                       (+ (* (mod y 2) 40) 40 (* 80 x)) (+ 10 (* 50 y))))
 
 ;; TODO: it would be better to draw a pre-rendered map image instead of drawing it cell by cell
 (draw-grid (game-map-to-grid game-map))
 (draw-units (:units @game-state))
 
-(defn update-world [])
+(js/requestAnimFrame stage/render-stage)
