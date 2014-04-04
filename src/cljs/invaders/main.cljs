@@ -6,7 +6,8 @@
    [clojure.browser.repl :as repl]))
 
 (repl/connect "http://localhost:9000/repl")
-
+(defn log [& items]
+  (.log js/console (apply str items)))
 
 ;; sprite functions
 
@@ -24,15 +25,24 @@
   (. stage addChild sprite))
 
 
-;; setup and rendering loop
+;;setup stats monitor
+(def stats (js/Stats.))
+(set! (-> (.-domElement stats) .-style .-position) 'absolute')
+(set! (-> (.-domElement stats) .-style .-top) 0)
 
+;; setup and rendering loop
 (def stage (js/PIXI.Stage. 0xaaaaaa))
 (def renderer (js/PIXI.autoDetectRenderer 1000 500))
+
 (.appendChild (.-body js/document) (.-view renderer))
+(.appendChild (.-body js/document) (.-domElement stats))
+
 
 (defn render-stage []
   (js/requestAnimFrame render-stage)
+  (.begin stats)
   (update-world)
+  (.end stats)
   (. renderer render stage))
 
 (js/requestAnimFrame render-stage)

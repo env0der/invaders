@@ -5,4 +5,5 @@
 (defn render []
   (layout/common "Invaders"
                  [:script {:src "js/vendor/pixi.js"}]
+                 [:script {:src "js/vendor/stats.js"}]
                  [:script {:src "js/build/invaders.js"}]))
