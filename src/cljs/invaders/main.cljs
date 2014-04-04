@@ -3,7 +3,8 @@
    [dommy.macros :only [node sel sel1]])
   (:require
    [dommy.core :as dommy]
-   [clojure.browser.repl :as repl]))
+   [clojure.browser.repl :as repl]
+   [invaders.client.maps :as maps]))
 
 (repl/connect "http://localhost:9000/repl")
 (defn log [& items]
@@ -27,12 +28,14 @@
 
 ;;setup stats monitor
 (def stats (js/Stats.))
-(set! (-> (.-domElement stats) .-style .-position) 'absolute')
-(set! (-> (.-domElement stats) .-style .-top) 0)
+(set! (-> (.-domElement stats) .-style .-position) "absolute")
+(set! (-> (.-domElement stats) .-style .-display) "inline-block")
+(set! (-> (.-domElement stats) .-style .-top) "0px")
+(set! (-> (.-domElement stats) .-style .-right) "0px")
 
 ;; setup and rendering loop
-(def stage (js/PIXI.Stage. 0xaaaaaa))
-(def renderer (js/PIXI.autoDetectRenderer 1000 500))
+(def stage (js/PIXI.Stage. 0xE3FCFF))
+(def renderer (js/PIXI.autoDetectRenderer (.-innerWidth js/window) (.-innerHeight js/window)))
 
 (.appendChild (.-body js/document) (.-view renderer))
 (.appendChild (.-body js/document) (.-domElement stats))
@@ -50,20 +53,13 @@
 
 ;; drawing game map
 (def tiles-textures {:w (create-texture "/images/water.png")
-                     :g (create-texture "/images/grass.png")})
+                     :g (create-texture "/images/grass.png")
+                     :s (create-texture "/images/sand.png")
+                     })
 
 (def units-textures {:marsman (create-texture "/images/marsman.png")})
 
-(def game-map [
-               [:g :g :g :g :g :g :g :g :g]
-               [:g :g :g :g :g :w :w :w :g]
-               [:g :g :g :g :g :w :w :w :g]
-               [:w :w :g :g :g :w :w :g :g]
-               [:w :w :g :g :g :g :g :g :g]
-               [:g :g :g :g :w :g :g :g :g]
-               [:g :g :g :g :g :w :g :g :g]
-               [:g :g :g :g :g :w :w :g :g]
-               ])
+(def game-map (:clearshore maps/maps))
 
 (defn game-map-to-grid [game-map]
   (vec (flatten (map-indexed (fn [y v]
@@ -71,10 +67,10 @@
                                ) game-map))))
 (def ui-state (atom {}))
 (def game-state (atom {:units {
-                               1 {:type :marsman :x 3 :y 4}
-                               2 {:type :marsman :x 2 :y 4}
-                               3 {:type :marsman :x 3 :y 2}
-                               4 {:type :marsman :x 2 :y 3}
+                               1 {:type :marsman :x 1 :y 4}
+                               2 {:type :marsman :x 2 :y 5}
+                               3 {:type :marsman :x 6 :y 4}
+                               4 {:type :marsman :x 2 :y 2}
                        }}))
 
 (defn highlight-tile [tile tint]

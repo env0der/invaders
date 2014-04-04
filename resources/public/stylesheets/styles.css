@@ -2,4 +2,8 @@ h1 {
     color: red;
 }
 
-#gamefield { border: 1px solid gray; }
+body {
+    overflow: hidden;
+    margin: 0px;
+    background-color: #E3FCFF;
+}
