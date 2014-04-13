@@ -20,13 +20,13 @@
   (vec (flatten (map-indexed (fn [y v]
                                (map-indexed (fn [x type] {:x x :y y :type type}) v)
                                ) game-map))))
-(def ui-state (atom {}))
+(def ui-state (atom {:map {}}))
 (def game-state (atom {:units {
                                1 {:type :marsman :x 1 :y 4}
                                2 {:type :marsman :x 2 :y 5}
                                3 {:type :marsman :x 6 :y 4}
                                4 {:type :marsman :x 2 :y 2}
-                       }}))
+                               }}))
 
 (defn highlight-tile [tile tint]
   (set! (.-tint tile) tint))
@@ -37,14 +37,20 @@
 (defn draw-tile [texture x y]
   (let [sprite (stage/create-sprite texture)]
     (stage/add-sprite-to-stage sprite)
+    (swap! ui-state assoc-in [:map x y] sprite)
     (set! (.-interactive sprite) true)
     (set! (.-click sprite) (fn [clickData]
-                             (let [selected-tile (:selected-tile @ui-state)]
-                               (if selected-tile
-                                 (remove-tile-highlight selected-tile)))
+                             (when-let [selected-tile (:selected-tile @ui-state)]
+                               (remove-tile-highlight selected-tile)
+                               (when-let [selected-unit (:selected-unit @ui-state)]
+                                 (move-unit selected-unit (.-map-x sprite) (.-map-y sprite))
+                                 (remove-tile-highlight selected-unit)
+                                 (swap! ui-state dissoc :selected-unit)))
                              (highlight-tile sprite 0xBBBBBB)
                              (swap! ui-state assoc :selected-tile sprite)))
-    (stage/set-sprite-position sprite (+ (* (mod y 2) 40) (* 80 x)) (* 50 y))))
+    (stage/set-sprite-position sprite (+ (* (mod y 2) 40) (* 80 x)) (* 50 y))
+    (set! (.-map-x sprite) x)
+    (set! (.-map-y sprite) y)))
 
 (defn draw-grid [grid]
   (doseq [cell grid]
@@ -55,10 +61,29 @@
                              (+ (* (mod y 2) 40) 40 (* 80 x)) (+ 10 (* 50 y))))
 
 (defn draw-units [units]
-  (doseq [unit (vals (:units @game-state))]
+  (doseq [[id unit] (:units @game-state)]
     (let [sprite (stage/create-sprite ((:type unit) textures/units-textures))]
+      (set! (.-unit-id sprite) id)
       (stage/add-sprite-to-stage sprite)
-      (set-unit-position sprite (:x unit) (:y unit)))))
+      (set-unit-position sprite (:x unit) (:y unit))
+      (set! (.-interactive sprite) true)
+      (set! (.-click sprite) (fn [clickData]
+                               (when-let [selected-unit (:selected-unit @ui-state)]
+                                 (remove-tile-highlight selected-unit))
+                               (highlight-tile sprite 0xBBBBBB)
+                               (swap! ui-state assoc :selected-unit sprite)
+                               (let [tile (get-in @ui-state [:map (get-in @game-state [:units (.-unit-id sprite) :x]) (get-in @game-state [:units (.-unit-id sprite) :y])])]
+                                    (select-tile tile)))))))
+
+(defn select-tile [tile]
+  (highlight-tile tile 0xBBBBBB)
+  (swap! ui-state assoc :selected-tile tile))
+
+(defn move-unit [unit x y]
+  (swap! game-state assoc-in [:units (.-unit-id unit) :x] x)
+  (swap! game-state assoc-in [:units (.-unit-id unit) :y] y)
+  (set-unit-position unit x y)
+)
 
 ;; TODO: it would be better to draw a pre-rendered map image instead of drawing it cell by cell
 (draw-grid (game-map-to-grid game-map))
