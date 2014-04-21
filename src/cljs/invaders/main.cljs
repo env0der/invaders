@@ -27,6 +27,11 @@
                                4 {:type :marsman :x 2 :y 2}
                                }}))
 
+(defn unit-tile [unit]
+  (get-in @ui-state
+          [:map (get-in @game-state [:units (.-unit-id unit) :x])
+                (get-in @game-state [:units (.-unit-id unit) :y])]))
+
 (defn sprite-tint [tile tint]
   (set! (.-tint tile) tint))
 
@@ -37,77 +42,46 @@
   (sprite-tint tile 0xBBBBBB))
 
 (defn sprite-selected []
-  (if (:selected-tile @ui-state) "tile"
-    (if (:selected-unit @ui-state) "unit" "nothing")))
+  (:sprite-selected @ui-state))
+
+(defn sprite-selected-type []
+  (if-let [selected (sprite-selected)] (.-sprite-type selected) "nothing"))
+
+(defn sprite-select [sprite]
+  (sprite-deselect)
+  (sprite-hshade sprite)
+  (swap! ui-state assoc :sprite-selected sprite)
+  (if (= "unit" (.-sprite-type sprite)) (sprite-hshade (unit-tile sprite))))
+
+(defn sprite-deselect
+  ([] (when-let [selected (sprite-selected)] (sprite-deselect selected)))
+  ([sprite]
+      (sprite-hclear sprite)
+      (swap! ui-state dissoc :sprite-selected)
+      (if (= "unit" (.-sprite-type sprite)) (sprite-hclear (unit-tile sprite)))))
 
 ; tile <- tile
 ; tile <- unit
 ; tile <- nothing
 (defn tile-click [tile clickData]
-  (.log js/console "selecting tile " (.-map-x tile) " " (.-map-y tile))
-
-  (case (sprite-selected)
-    "tile" (let [selected-tile (:selected-tile @ui-state)]
-             (log "tile -> tile")
-             (sprite-hclear selected-tile)
-             (sprite-hshade tile)
-             (swap! ui-state assoc :selected-tile tile)
-             (swap! ui-state dissoc :selected-unit))
-
-    "unit" (let [selected-unit (:selected-unit @ui-state)]
-             (log "unit -> tile")
-             (sprite-hclear selected-unit)
-             (sprite-hclear (unit-tile selected-unit))
-             (move-unit selected-unit (.-map-x tile) (.-map-y tile))
-             (swap! ui-state dissoc :selected-tile)
-             (swap! ui-state dissoc :selected-unit))
-
-    "nothing" (do
-                (log "nothing -> tile")
-                (sprite-hshade tile)
-                (swap! ui-state assoc :selected-tile tile)
-                (swap! ui-state dissoc :selected-unit))))
-
-(defn unit-tile [unit]
-  (get-in @ui-state
-          [:map (get-in @game-state [:units (.-unit-id unit) :x])
-                (get-in @game-state [:units (.-unit-id unit) :y])]))
+  (case (sprite-selected-type)
+    "tile" (sprite-select tile)
+    "unit" (do
+             (sprite-deselect)
+             (move-unit (sprite-selected) (.-map-x tile) (.-map-y tile)))
+    "nothing" (sprite-select tile)))
 
 ; unit <- tile
 ; unit <- unit
 ; unit <- nothing
 (defn unit-click [unit clickData]
-  (.log js/console "selecting unit " (.-map-x unit) " " (.-map-y unit))
-
-  (case (sprite-selected)
-    "tile" (let [selected-tile (:selected-tile @ui-state)]
-             (log "tile -> unit")
-             (sprite-hclear selected-tile)
-             (sprite-hshade (unit-tile unit))
-             (sprite-hshade unit)
-             (swap! ui-state dissoc :selected-tile)
-             (swap! ui-state assoc :selected-unit unit))
-
-    "unit" (let [selected-unit (:selected-unit @ui-state)]
-             (log "unit -> unit")
-             (sprite-hclear selected-unit)
-             (sprite-hclear (unit-tile selected-unit))
-             (sprite-hshade (unit-tile unit))
-             (sprite-hshade unit)
-             (swap! ui-state dissoc :selected-tile)
-             (swap! ui-state assoc :selected-unit unit))
-
-    "nothing" (do
-                (log "nothing -> unit")
-                (sprite-hshade (unit-tile unit))
-                (sprite-hshade unit)
-                (swap! ui-state dissoc :selected-tile)
-                (swap! ui-state assoc :selected-unit unit))))
+  (sprite-select unit))
 
 (defn draw-tile [texture x y]
   (let [sprite (stage/create-sprite texture)]
     (stage/add-sprite-to-stage sprite)
     (swap! ui-state assoc-in [:map x y] sprite)
+    (set! (.-sprite-type sprite) "tile")
     (set! (.-interactive sprite) true)
     (set! (.-click sprite) #(tile-click sprite %))
     (sprite-grid-position sprite x y)
@@ -132,6 +106,7 @@
 (defn draw-units [units]
   (doseq [[id unit] (:units @game-state)]
     (let [sprite (stage/create-sprite ((:type unit) textures/units-textures))]
+      (set! (.-sprite-type sprite) "unit")
       (set! (.-unit-id sprite) id)
       (stage/add-sprite-to-stage sprite)
       (unit-grid-position sprite (:x unit) (:y unit))
