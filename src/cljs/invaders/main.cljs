@@ -72,7 +72,7 @@
     (+ (* (mod y 2) 40) (* 80 x) offset-x)
     (+ (* 50 y) 35 offset-y) ))
 
-(defn sprite-click [sprite clickData]
+(defn unit-click [sprite clickData]
   (when-let [selected-unit (:selected-unit @ui-state)]
     (tile-hclear selected-unit))
   (tile-hshade sprite)
@@ -88,7 +88,7 @@
       (stage/add-sprite-to-stage sprite)
       (unit-grid-position sprite (:x unit) (:y unit))
       (set! (.-interactive sprite) true)
-      (set! (.-click sprite) #(sprite-click sprite %)))))
+      (set! (.-click sprite) #(unit-click sprite %)))))
 
 (defn select-tile [tile]
   (tile-hshade tile)
