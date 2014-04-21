@@ -34,20 +34,22 @@
 (defn remove-tile-highlight [tile]
   (highlight-tile tile 0xFFFFFF))
 
+(defn tile-click [sprite clickData]
+  (when-let [selected-tile (:selected-tile @ui-state)]
+    (remove-tile-highlight selected-tile)
+    (when-let [selected-unit (:selected-unit @ui-state)]
+      (move-unit selected-unit (.-map-x sprite) (.-map-y sprite))
+      (remove-tile-highlight selected-unit)
+      (swap! ui-state dissoc :selected-unit)))
+  (highlight-tile sprite 0xBBBBBB)
+  (swap! ui-state assoc :selected-tile sprite))
+
 (defn draw-tile [texture x y]
   (let [sprite (stage/create-sprite texture)]
     (stage/add-sprite-to-stage sprite)
     (swap! ui-state assoc-in [:map x y] sprite)
     (set! (.-interactive sprite) true)
-    (set! (.-click sprite) (fn [clickData]
-                             (when-let [selected-tile (:selected-tile @ui-state)]
-                               (remove-tile-highlight selected-tile)
-                               (when-let [selected-unit (:selected-unit @ui-state)]
-                                 (move-unit selected-unit (.-map-x sprite) (.-map-y sprite))
-                                 (remove-tile-highlight selected-unit)
-                                 (swap! ui-state dissoc :selected-unit)))
-                             (highlight-tile sprite 0xBBBBBB)
-                             (swap! ui-state assoc :selected-tile sprite)))
+    (set! (.-click sprite) #(tile-click sprite %))
     (stage/set-sprite-position sprite (+ (* (mod y 2) 40) (* 80 x)) (* 50 y))
     (set! (.-map-x sprite) x)
     (set! (.-map-y sprite) y)))
@@ -60,6 +62,15 @@
   (stage/set-sprite-position unit
                              (+ (* (mod y 2) 40) 40 (* 80 x)) (+ 10 (* 50 y))))
 
+(defn sprite-click [sprite clickData]
+  (when-let [selected-unit (:selected-unit @ui-state)]
+    (remove-tile-highlight selected-unit))
+  (highlight-tile sprite 0xBBBBBB)
+  (swap! ui-state assoc :selected-unit sprite)
+  (select-tile (get-in @ui-state
+                       [:map (get-in @game-state [:units (.-unit-id sprite) :x])
+                             (get-in @game-state [:units (.-unit-id sprite) :y])])))
+
 (defn draw-units [units]
   (doseq [[id unit] (:units @game-state)]
     (let [sprite (stage/create-sprite ((:type unit) textures/units-textures))]
@@ -67,13 +78,7 @@
       (stage/add-sprite-to-stage sprite)
       (set-unit-position sprite (:x unit) (:y unit))
       (set! (.-interactive sprite) true)
-      (set! (.-click sprite) (fn [clickData]
-                               (when-let [selected-unit (:selected-unit @ui-state)]
-                                 (remove-tile-highlight selected-unit))
-                               (highlight-tile sprite 0xBBBBBB)
-                               (swap! ui-state assoc :selected-unit sprite)
-                               (let [tile (get-in @ui-state [:map (get-in @game-state [:units (.-unit-id sprite) :x]) (get-in @game-state [:units (.-unit-id sprite) :y])])]
-                                    (select-tile tile)))))))
+      (set! (.-click sprite) #(sprite-click sprite %)))))
 
 (defn select-tile [tile]
   (highlight-tile tile 0xBBBBBB)
