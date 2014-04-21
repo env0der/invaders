@@ -28,20 +28,23 @@
                                4 {:type :marsman :x 2 :y 2}
                                }}))
 
-(defn highlight-tile [tile tint]
+(defn tile-tint [tile tint]
   (set! (.-tint tile) tint))
 
-(defn remove-tile-highlight [tile]
-  (highlight-tile tile 0xFFFFFF))
+(defn tile-hclear [tile]
+  (tile-tint tile 0xFFFFFF))
+
+(defn tile-hshade [tile]
+  (tile-tint tile 0xBBBBBB))
 
 (defn tile-click [sprite clickData]
   (when-let [selected-tile (:selected-tile @ui-state)]
-    (remove-tile-highlight selected-tile)
+    (tile-hclear selected-tile)
     (when-let [selected-unit (:selected-unit @ui-state)]
       (move-unit selected-unit (.-map-x sprite) (.-map-y sprite))
-      (remove-tile-highlight selected-unit)
+      (tile-hclear selected-unit)
       (swap! ui-state dissoc :selected-unit)))
-  (highlight-tile sprite 0xBBBBBB)
+  (tile-hshade sprite)
   (swap! ui-state assoc :selected-tile sprite))
 
 (defn draw-tile [texture x y]
@@ -64,8 +67,8 @@
 
 (defn sprite-click [sprite clickData]
   (when-let [selected-unit (:selected-unit @ui-state)]
-    (remove-tile-highlight selected-unit))
-  (highlight-tile sprite 0xBBBBBB)
+    (tile-hclear selected-unit))
+  (tile-hshade sprite)
   (swap! ui-state assoc :selected-unit sprite)
   (select-tile (get-in @ui-state
                        [:map (get-in @game-state [:units (.-unit-id sprite) :x])
@@ -81,7 +84,7 @@
       (set! (.-click sprite) #(sprite-click sprite %)))))
 
 (defn select-tile [tile]
-  (highlight-tile tile 0xBBBBBB)
+  (tile-hshade tile)
   (swap! ui-state assoc :selected-tile tile))
 
 (defn move-unit [unit x y]
