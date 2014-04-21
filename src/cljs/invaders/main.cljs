@@ -70,7 +70,7 @@
   (stage/set-sprite-position
     sprite
     (+ (* (mod y 2) 40) (* 80 x) offset-x)
-    (+ (* 50 y) offset-y) ))
+    (+ (* 50 y) 35 offset-y) ))
 
 (defn sprite-click [sprite clickData]
   (when-let [selected-unit (:selected-unit @ui-state)]
