@@ -27,14 +27,14 @@
                                4 {:type :marsman :x 2 :y 2}
                                }}))
 
-(defn tile-tint [tile tint]
+(defn sprite-tint [tile tint]
   (set! (.-tint tile) tint))
 
-(defn tile-hclear [tile]
-  (tile-tint tile 0xFFFFFF))
+(defn sprite-hclear [tile]
+  (sprite-tint tile 0xFFFFFF))
 
-(defn tile-hshade [tile]
-  (tile-tint tile 0xBBBBBB))
+(defn sprite-hshade [tile]
+  (sprite-tint tile 0xBBBBBB))
 
 (defn selected []
   (if (:selected-tile @ui-state) "tile"
@@ -49,22 +49,22 @@
   (case (selected)
     "tile" (let [selected-tile (:selected-tile @ui-state)]
              (log "tile -> tile")
-             (tile-hclear selected-tile)
-             (tile-hshade tile)
+             (sprite-hclear selected-tile)
+             (sprite-hshade tile)
              (swap! ui-state assoc :selected-tile tile)
              (swap! ui-state dissoc :selected-unit))
 
     "unit" (let [selected-unit (:selected-unit @ui-state)]
              (log "unit -> tile")
-             (tile-hclear selected-unit)
-             (tile-hclear (unit-tile selected-unit))
+             (sprite-hclear selected-unit)
+             (sprite-hclear (unit-tile selected-unit))
              (move-unit selected-unit (.-map-x tile) (.-map-y tile))
              (swap! ui-state dissoc :selected-tile)
              (swap! ui-state dissoc :selected-unit))
 
     "nothing" (do
                 (log "nothing -> tile")
-                (tile-hshade tile)
+                (sprite-hshade tile)
                 (swap! ui-state assoc :selected-tile tile)
                 (swap! ui-state dissoc :selected-unit))))
 
@@ -82,25 +82,25 @@
   (case (selected)
     "tile" (let [selected-tile (:selected-tile @ui-state)]
              (log "tile -> unit")
-             (tile-hclear selected-tile)
-             (tile-hshade (unit-tile unit))
-             (tile-hshade unit)
+             (sprite-hclear selected-tile)
+             (sprite-hshade (unit-tile unit))
+             (sprite-hshade unit)
              (swap! ui-state dissoc :selected-tile)
              (swap! ui-state assoc :selected-unit unit))
 
     "unit" (let [selected-unit (:selected-unit @ui-state)]
              (log "unit -> unit")
-             (tile-hclear selected-unit)
-             (tile-hclear (unit-tile selected-unit))
-             (tile-hshade (unit-tile unit))
-             (tile-hshade unit)
+             (sprite-hclear selected-unit)
+             (sprite-hclear (unit-tile selected-unit))
+             (sprite-hshade (unit-tile unit))
+             (sprite-hshade unit)
              (swap! ui-state dissoc :selected-tile)
              (swap! ui-state assoc :selected-unit unit))
 
     "nothing" (do
                 (log "nothing -> unit")
-                (tile-hshade (unit-tile unit))
-                (tile-hshade unit)
+                (sprite-hshade (unit-tile unit))
+                (sprite-hshade unit)
                 (swap! ui-state dissoc :selected-tile)
                 (swap! ui-state assoc :selected-unit unit))))
 
@@ -139,7 +139,7 @@
       (set! (.-click sprite) #(unit-click sprite %)))))
 
 (defn select-tile [tile]
-  (tile-hshade tile)
+  (sprite-hshade tile)
   (swap! ui-state assoc :selected-tile tile))
 
 (defn move-unit [unit x y]
