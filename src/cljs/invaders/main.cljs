@@ -97,7 +97,7 @@
 (defn move-unit [unit x y]
   (swap! game-state assoc-in [:units (.-unit-id unit) :x] x)
   (swap! game-state assoc-in [:units (.-unit-id unit) :y] y)
-  (unit-grid-position unit x y :offset-x 5 :offset-y -35)
+  (unit-grid-position unit x y)
 )
 
 ;; TODO: it would be better to draw a pre-rendered map image instead of drawing it cell by cell
