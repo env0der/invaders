@@ -17,8 +17,10 @@
   :cljsbuild {:builds
               [{:source-paths ["src/cljs"]
                 :compiler {:output-to "resources/public/js/build/invaders.js"
-                           :optimizations :whitespace
-                           :pretty-print true}}]}
+                           :output-dir "resources/public/js/build"
+                           :optimizations :none
+                           :pretty-print true
+                           :source-map true}}]}
   :profiles
   {:dev {:dependencies [[ring-mock "0.1.5"]]}}
   :main invaders.handler)

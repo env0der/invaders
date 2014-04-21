@@ -13,7 +13,6 @@
 (defn log [& items]
   (.log js/console (apply str items)))
 
-
 (def game-map (:clearshore maps/maps))
 
 (defn game-map-to-grid [game-map]
