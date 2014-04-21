@@ -12,7 +12,8 @@
                  [hiccup "1.0.5"]
                  [com.novemberain/monger "1.7.0"]
                  [prismatic/dommy "0.1.2"]]
-  :plugins [[lein-cljsbuild "1.0.0"]]
+  :plugins [[lein-cljsbuild "1.0.0"] [lein-pdo "0.1.1"]]
+  :aliases {"up" ["pdo" "cljsbuild" "auto," "run" "-dev"]}
   :cljsbuild {:builds
               [{:source-paths ["src/cljs"]
                 :compiler {:output-to "resources/public/js/build/invaders.js"

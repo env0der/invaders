@@ -1,4 +1,0 @@
-#!/bin/zsh
-
-lein cljsbuild auto &
-lein run
