@@ -36,7 +36,7 @@
 (defn sprite-hshade [tile]
   (sprite-tint tile 0xBBBBBB))
 
-(defn selected []
+(defn sprite-selected []
   (if (:selected-tile @ui-state) "tile"
     (if (:selected-unit @ui-state) "unit" "nothing")))
 
@@ -46,7 +46,7 @@
 (defn tile-click [tile clickData]
   (.log js/console "selecting tile " (.-map-x tile) " " (.-map-y tile))
 
-  (case (selected)
+  (case (sprite-selected)
     "tile" (let [selected-tile (:selected-tile @ui-state)]
              (log "tile -> tile")
              (sprite-hclear selected-tile)
@@ -79,7 +79,7 @@
 (defn unit-click [unit clickData]
   (.log js/console "selecting unit " (.-map-x unit) " " (.-map-y unit))
 
-  (case (selected)
+  (case (sprite-selected)
     "tile" (let [selected-tile (:selected-tile @ui-state)]
              (log "tile -> unit")
              (sprite-hclear selected-tile)
