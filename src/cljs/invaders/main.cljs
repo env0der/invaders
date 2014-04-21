@@ -21,7 +21,7 @@
                                ) game-map))))
 (def ui-state (atom {:map {}}))
 (def game-state (atom {:units {
-                               1 {:type :marsman :x 1 :y 4}
+                               1 {:type :marsman :x 1 :y 7}
                                2 {:type :marsman :x 2 :y 5}
                                3 {:type :marsman :x 6 :y 4}
                                4 {:type :marsman :x 2 :y 2}
@@ -37,6 +37,7 @@
   (tile-tint tile 0xBBBBBB))
 
 (defn tile-click [sprite clickData]
+  (.log js/console "selecting tile " (.-map-x sprite) " " (.-map-y sprite))
   (when-let [selected-tile (:selected-tile @ui-state)]
     (tile-hclear selected-tile)
     (when-let [selected-unit (:selected-unit @ui-state)]
@@ -52,7 +53,7 @@
     (swap! ui-state assoc-in [:map x y] sprite)
     (set! (.-interactive sprite) true)
     (set! (.-click sprite) #(tile-click sprite %))
-    (stage/set-sprite-position sprite (+ (* (mod y 2) 40) (* 80 x)) (* 50 y))
+    (sprite-grid-position sprite x y)
     (set! (.-map-x sprite) x)
     (set! (.-map-y sprite) y)))
 
@@ -60,9 +61,16 @@
   (doseq [cell grid]
     (draw-tile ((:type cell) textures/tiles-textures) (:x cell) (:y cell))))
 
-(defn set-unit-position [unit x y]
-  (stage/set-sprite-position unit
-                             (+ (* (mod y 2) 40) 40 (* 80 x)) (+ 10 (* 50 y))))
+(defn unit-grid-position [unit x y]
+  (sprite-grid-position unit x y :offset-x 5 :offset-y -35))
+
+(defn sprite-grid-position [sprite x y & {:keys [offset-x offset-y]
+                                          :or {offset-x 0
+                                               offset-y 0}}]
+  (stage/set-sprite-position
+    sprite
+    (+ (* (mod y 2) 40) (* 80 x) offset-x)
+    (+ (* 50 y) offset-y) ))
 
 (defn sprite-click [sprite clickData]
   (when-let [selected-unit (:selected-unit @ui-state)]
@@ -78,7 +86,7 @@
     (let [sprite (stage/create-sprite ((:type unit) textures/units-textures))]
       (set! (.-unit-id sprite) id)
       (stage/add-sprite-to-stage sprite)
-      (set-unit-position sprite (:x unit) (:y unit))
+      (unit-grid-position sprite (:x unit) (:y unit))
       (set! (.-interactive sprite) true)
       (set! (.-click sprite) #(sprite-click sprite %)))))
 
@@ -89,7 +97,7 @@
 (defn move-unit [unit x y]
   (swap! game-state assoc-in [:units (.-unit-id unit) :x] x)
   (swap! game-state assoc-in [:units (.-unit-id unit) :y] y)
-  (set-unit-position unit x y)
+  (unit-grid-position unit x y :offset-x 5 :offset-y -35)
 )
 
 ;; TODO: it would be better to draw a pre-rendered map image instead of drawing it cell by cell
