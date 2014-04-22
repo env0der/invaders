@@ -1,5 +1,6 @@
 (ns invaders.client.sprite
   (:require
+   [invaders.client.textures :as textures]
    [invaders.client.stage :as stage]
    [invaders.client.state :as state]))
 
@@ -43,3 +44,13 @@
   (get-in @state/ui
           [:map (get-in @state/game [:units (.-unit-id unit) :x])
                 (get-in @state/game [:units (.-unit-id unit) :y])]))
+
+(defn click [sprite fun]
+  (set! (.-click sprite) fun))
+
+(defn create-unit [id unit]
+  (let [sprite (stage/create-sprite ((:type unit) textures/units-textures))]
+    (set! (.-sprite-type sprite) "unit")
+    (set! (.-unit-id sprite) id)
+    (set! (.-interactive sprite) true)
+    sprite))

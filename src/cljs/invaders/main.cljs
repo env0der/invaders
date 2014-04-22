@@ -59,13 +59,10 @@
 
 (defn draw-units [units]
   (doseq [[id unit] (:units @state/game)]
-    (let [sprite (stage/create-sprite ((:type unit) textures/units-textures))]
-      (set! (.-sprite-type sprite) "unit")
-      (set! (.-unit-id sprite) id)
+    (let [sprite (sprite/create-unit id unit)]
       (stage/add-sprite-to-stage sprite)
       (unit-grid-position sprite (:x unit) (:y unit))
-      (set! (.-interactive sprite) true)
-      (set! (.-click sprite) #(unit-click sprite %)))))
+      (sprite/click sprite #(unit-click sprite %)))))
 
 (defn select-tile [tile]
   (sprite/hshade tile)
