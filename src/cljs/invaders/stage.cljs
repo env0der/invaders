@@ -19,9 +19,6 @@
   (.end stats)
   (. renderer render stage))
 
-(defn create-sprite [texture]
-  (js/PIXI.Sprite. texture))
-
 (defn add-sprite-to-stage [sprite]
   (.addChild stage sprite))
 

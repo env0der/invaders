@@ -52,14 +52,14 @@
   (set! (.-click sprite) fun))
 
 (defn create-unit [id unit]
-  (let [sprite (stage/create-sprite ((:type unit) textures/units-textures))]
+  (let [sprite (js/PIXI.Sprite. ((:type unit) textures/units-textures))]
     (set! (.-sprite-type sprite) "unit")
     (set! (.-unit-id sprite) id)
     (set! (.-interactive sprite) true)
     sprite))
 
 (defn create-tile [tile]
-  (let [sprite (stage/create-sprite ((:type tile) textures/tiles-textures))
+  (let [sprite (js/PIXI.Sprite. ((:type tile) textures/tiles-textures))
         x (:x tile)
         y (:y tile)]
     (swap! state/ui assoc-in [:map x y] sprite)
