@@ -32,6 +32,11 @@
       (swap! state/ui dissoc :selected)
       (if (= "unit" (.-sprite-type sprite)) (hclear (unit-tile sprite)))))
 
+(defn position [sprite x y]
+  (case (.-sprite-type sprite)
+    "tile" (grid-position sprite x y)
+    "unit" (grid-position sprite x y :offset-x 5 :offset-y -35)))
+
 (defn grid-position [sprite x y & {:keys [offset-x offset-y]
                                           :or {offset-x 0
                                                offset-y 0}}]

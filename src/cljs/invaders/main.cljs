@@ -22,9 +22,6 @@
                                (map-indexed (fn [x type] {:x x :y y :type type}) v)
                                ) game-map))))
 
-; tile <- tile
-; tile <- unit
-; tile <- nothing
 (defn tile-click [tile clickData]
   (case (sprite/selected-type)
     "tile" (sprite/select tile)
@@ -33,33 +30,24 @@
              (move-unit selected (.-map-x tile) (.-map-y tile)))
     "nothing" (sprite/select tile)))
 
-; unit <- tile
-; unit <- unit
-; unit <- nothing
-(defn unit-click [unit clickData]
-  (sprite/select unit))
+(defn move-unit [unit x y]
+  (swap! state/game assoc-in [:units (.-unit-id unit) :x] x)
+  (swap! state/game assoc-in [:units (.-unit-id unit) :y] y)
+  (sprite/position unit x y))
 
 (defn draw-grid [grid]
   (doseq [tile grid]
     (let [sprite (sprite/create-tile tile)]
       (stage/add-sprite-to-stage sprite)
       (sprite/click sprite #(tile-click sprite %))
-      (sprite/grid-position sprite (:x tile) (:y tile)))))
-
-(defn unit-grid-position [unit x y]
-  (sprite/grid-position unit x y :offset-x 5 :offset-y -35))
+      (sprite/position sprite (:x tile) (:y tile)))))
 
 (defn draw-units [units]
   (doseq [[id unit] (:units @state/game)]
     (let [sprite (sprite/create-unit id unit)]
       (stage/add-sprite-to-stage sprite)
-      (unit-grid-position sprite (:x unit) (:y unit))
-      (sprite/click sprite #(unit-click sprite %)))))
-
-(defn move-unit [unit x y]
-  (swap! state/game assoc-in [:units (.-unit-id unit) :x] x)
-  (swap! state/game assoc-in [:units (.-unit-id unit) :y] y)
-  (unit-grid-position unit x y))
+      (sprite/position sprite (:x unit) (:y unit))
+      (sprite/click sprite #(sprite/select sprite)))))
 
 ;; TODO: it would be better to draw a pre-rendered map image instead of drawing it cell by cell
 (draw-grid (game-map-to-grid game-map))
