@@ -40,10 +40,8 @@
 (defn grid-position [sprite x y & {:keys [offset-x offset-y]
                                           :or {offset-x 0
                                                offset-y 0}}]
-  (stage/set-sprite-position
-    sprite
-    (+ (* (mod y 2) 40) (* 80 x) offset-x)
-    (+ (* 50 y) 35 offset-y) ))
+  (set! (.-position.x sprite) (+ (* (mod y 2) 40) (* 80 x) offset-x))
+  (set! (.-position.y sprite) (+ (* 50 y) 35 offset-y)))
 
 (defn unit-tile [unit]
   (get-in @state/ui

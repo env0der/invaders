@@ -19,13 +19,8 @@
   (.end stats)
   (. renderer render stage))
 
-
 (defn create-sprite [texture]
   (js/PIXI.Sprite. texture))
-
-(defn set-sprite-position [sprite x y]
-  (set! (.-position.x sprite) x)
-  (set! (.-position.y sprite) y))
 
 (defn add-sprite-to-stage [sprite]
   (.addChild stage sprite))
