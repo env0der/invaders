@@ -54,3 +54,14 @@
     (set! (.-unit-id sprite) id)
     (set! (.-interactive sprite) true)
     sprite))
+
+(defn create-tile [tile]
+  (let [sprite (stage/create-sprite ((:type tile) textures/tiles-textures))
+        x (:x tile)
+        y (:y tile)]
+    (swap! state/ui assoc-in [:map x y] sprite)
+    (set! (.-sprite-type sprite) "tile")
+    (set! (.-interactive sprite) true)
+    (set! (.-map-x sprite) x)
+    (set! (.-map-y sprite) y)
+    sprite))
