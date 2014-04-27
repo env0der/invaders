@@ -8,7 +8,7 @@
   (:sprites @state/ui))
 
 (defn get-sprite [id]
-  (get-in state/ui [:sprites id]))
+  (get-in @state/ui [:sprites id]))
 
 (defn sprite-exists? [id]
   (not (nil? (get-sprite id))))
