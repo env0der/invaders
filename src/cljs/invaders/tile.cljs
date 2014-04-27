@@ -7,6 +7,12 @@
 (defn sprites []
   (:sprites @state/ui))
 
+(defn get-sprite [id]
+  (get-in state/ui [:sprites id]))
+
+(defn sprite-exists? [id]
+  (not (nil? (get-sprite id))))
+
 (defn create-sprite [id tile]
   (let [texture-name (:type tile) x (:x tile) y (:y tile)
         new-sprite (sprite/create id texture-name)]
@@ -19,8 +25,8 @@
     new-sprite))
 
 (defn get-or-create-sprite [id tile]
-  (if-let [sprite (get id sprites)]
-    sprite (create-sprite id tile)))
+  (when-not (sprite-exists? id) (create-sprite id tile))
+  (get-sprite id))
 
 (defn render [id tile]
   (let [sprite (get-or-create-sprite id tile)]
