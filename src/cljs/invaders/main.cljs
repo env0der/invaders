@@ -39,8 +39,4 @@
       (sprite/position sprite (:x unit) (:y unit))
       (sprite/click sprite #(sprite/select sprite)))))
 
-;; TODO: it would be better to draw a pre-rendered map image instead of drawing it cell by cell
-(draw-grid (game-map-to-grid game-map))
-(draw-units (:units @state/game))
-
 (js/requestAnimFrame stage/render-stage)
