@@ -28,7 +28,7 @@
 
 
 (defn update-world []
-  (let [tiles (main/game-map-to-grid main/game-map)]
+  (let [tiles (state/game-map-to-grid state/game-map)]
        [units (:units @state/game)]
        (render tiles tile/render)
        ;;(render units unit/render)
