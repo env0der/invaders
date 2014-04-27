@@ -22,4 +22,14 @@
 (defn add-sprite-to-stage [sprite]
   (.addChild stage sprite))
 
-(defn update-world [])
+(defn render [entities, renderer]
+  (doseq [entity entities]
+    (renderer entity)))
+
+
+(defn update-world []
+  (let [tiles (main/game-map-to-grid main/game-map)]
+       [units (:units @state/game)]
+       (render tiles tile/render)
+       ;;(render units unit/render)
+       ))
