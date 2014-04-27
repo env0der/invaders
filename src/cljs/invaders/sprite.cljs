@@ -1,5 +1,6 @@
 (ns invaders.client.sprite
   (:require
+   [clojure.string :as string]
    [invaders.client.textures :as textures]
    [invaders.client.stage :as stage]
    [invaders.client.state :as state]))
@@ -55,6 +56,13 @@
   (let [sprite (js/PIXI.Sprite. ((:type unit) textures/units-textures))]
     (set! (.-sprite-type sprite) "unit")
     (set! (.-unit-id sprite) id)
+    (set! (.-interactive sprite) true)
+    sprite))
+
+(defn create [id texture-name]
+  (let [sprite (js/PIXI.Sprite. (texture textures/tiles-textures))]
+    (set! (.-sprite-type sprite) (first (string/split id #":")))
+    (set! (.-sprite-id sprite) id)
     (set! (.-interactive sprite) true)
     sprite))
 
