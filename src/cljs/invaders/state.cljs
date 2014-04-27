@@ -1,7 +1,8 @@
 (ns invaders.client.state)
 
 (def ui (atom { :map {}
-                :sprites {} }))
+                :sprites {}
+                :selected (list) }))
 
 (def game (atom {:units { 1 {:type :marsman :x 1 :y 7}
                           2 {:type :marsman :x 2 :y 5}
