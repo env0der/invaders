@@ -18,4 +18,15 @@
         y (:y tile)]
     (swap! state/ui assoc-in id sprite)
     (set! (.-map-x sprite) x)
-    (set! (.-map-y sprite) y)))
+    (set! (.-map-y sprite) y)
+    (stage/add-sprite-to-stage sprite)
+    (sprite/click sprite #(click sprite %))
+    (sprite/position sprite x y)))
+
+(defn click [tile-sprite clickData]
+  (case (sprite/selected-type)
+    "tile" (sprite/select tile-sprite)
+    "unit" (let [selected (sprite/selected)]
+             (sprite/deselect)
+             (unit/move selected (.-map-x tile-sprite) (.-map-y tile-sprite)))
+    "nothing" (sprite/select tile-sprite)))

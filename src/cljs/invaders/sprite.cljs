@@ -3,7 +3,8 @@
    [clojure.string :as string]
    [invaders.client.textures :as textures]
    [invaders.client.stage :as stage]
-   [invaders.client.state :as state]))
+   [invaders.client.state :as state]
+   [invaders.client.unit :as unit]))
 
 (defn tint [tile tint]
   (set! (.-tint tile) tint))
@@ -23,7 +24,7 @@
 (defn select [sprite]
   (swap! state/ui assoc :selected
     (remove nil?
-      (list sprite (if (= "unit" (.-sprite-type sprite)) (unit-tile sprite))))))
+      (list sprite (if (= "unit" (.-sprite-type sprite)) (unit/tile sprite))))))
 
 (defn deselect []
   (swap! state/ui assoc :selected (list)))
@@ -38,9 +39,6 @@
                                                offset-y 0}}]
   (set! (.-position.x sprite) (+ (* (mod y 2) 40) (* 80 x) offset-x))
   (set! (.-position.y sprite) (+ (* 50 y) 35 offset-y)))
-
-(defn unit-tile [unit]
-  (get (string/join ":" ["tile" (:x unit) (:y unit)]) (:sprites @state/ui)))
 
 (defn click [sprite fun]
   (set! (.-click sprite) fun))
