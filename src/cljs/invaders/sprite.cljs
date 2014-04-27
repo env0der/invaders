@@ -44,7 +44,7 @@
   (set! (.-click sprite) fun))
 
 (defn create [id texture-name]
-  (let [sprite (js/PIXI.Sprite. (texture textures/tiles-textures))]
+  (let [sprite (js/PIXI.Sprite. (texture-name textures/tiles-textures))]
     (set! (.-sprite-type sprite) (first (string/split id #":")))
     (set! (.-sprite-id sprite) id)
     (set! (.-interactive sprite) true)

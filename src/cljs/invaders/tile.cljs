@@ -1,27 +1,31 @@
 (ns invaders.client.tile
   (:require
-    [invaders.client.state :as state]))
+    [invaders.client.state :as state]
+    [invaders.client.stage :as stage]
+    [invaders.client.sprite :as sprite]))
 
 (defn sprites []
   (:sprites @state/ui))
 
-(defn render-target [id texture-name]
-  (if-let [sprite (id sprites)]
-    sprite
-    (let [new-sprite (sprite/create id texture-name)]
-      (swap! sprites assoc-in id new-sprite)
-      new-sprite)))
+(defn create-sprite [id tile]
+  (let [texture-name (:type tile) x (:x tile) y (:y tile)
+        new-sprite (sprite/create id texture-name)]
+    (swap! state/ui assoc-in [:sprites id] new-sprite)
+    (set! (.-map-x new-sprite) x)
+    (set! (.-map-y new-sprite) y)
+    (stage/add-sprite-to-stage new-sprite)
+    (sprite/click new-sprite #(click new-sprite %))
+    (sprite/position new-sprite x y)
+    new-sprite))
+
+(defn get-or-create-sprite [id tile]
+  (if-let [sprite (get id sprites)]
+    sprite (create-sprite id tile)))
 
 (defn render [id tile]
-  (let [sprite (render-target id (:type tile))
-        x (:x tile)
-        y (:y tile)]
-    (swap! state/ui assoc-in id sprite)
-    (set! (.-map-x sprite) x)
-    (set! (.-map-y sprite) y)
-    (stage/add-sprite-to-stage sprite)
-    (sprite/click sprite #(click sprite %))
-    (sprite/position sprite x y)))
+  (let [sprite (get-or-create-sprite id tile)]
+    ;; select logic
+    ))
 
 (defn click [tile-sprite clickData]
   (case (sprite/selected-type)

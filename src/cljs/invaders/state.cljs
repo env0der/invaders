@@ -1,4 +1,13 @@
-(ns invaders.client.state)
+(ns invaders.client.state
+  (:require
+    [invaders.client.maps :as maps]))
+
+(def game-map (:clearshore maps/maps))
+
+(defn game-map-to-grid [game-map]
+  (vec (flatten (map-indexed (fn [y v]
+                               (map-indexed (fn [x type] {:x x :y y :type type}) v)
+                               ) game-map))))
 
 (def ui (atom { :map {}
                 :sprites {}

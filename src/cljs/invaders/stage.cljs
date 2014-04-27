@@ -1,4 +1,8 @@
-(ns invaders.client.stage)
+(ns invaders.client.stage
+  (:require
+    [invaders.client.state :as state]
+    [invaders.client.tile :as tile]
+    [invaders.client.unit :as unit]))
 
 (def stage (js/PIXI.Stage. 0xE3FCFF))
 (def renderer (js/PIXI.autoDetectRenderer (.-innerWidth js/window) (.-innerHeight js/window)))
@@ -22,14 +26,8 @@
 (defn add-sprite-to-stage [sprite]
   (.addChild stage sprite))
 
-(defn render [entities, renderer]
-  (doseq [entity entities]
-    (renderer entity)))
-
-
 (defn update-world []
-  (let [tiles (state/game-map-to-grid state/game-map)]
-       [units (:units @state/game)]
-       (render tiles tile/render)
-       ;;(render units unit/render)
-       ))
+  (let [tiles (state/game-map-to-grid state/game-map)
+        units (:units @state/game)]
+    (doseq [tile tiles]
+      (tile/render (str "tile:" (:x tile) ":" (:y tile)) tile))))
