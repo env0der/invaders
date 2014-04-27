@@ -22,3 +22,6 @@
 (defn render [id unit]
   (let [sprite (get-or-create-sprite id (:type unit))]
     (sprite/position sprite (:x unit) (:y unit))))
+
+(defn tile [unit]
+  (get (str "tile:" (:x unit) ":" (:y unit)) (:sprites @state/ui)))
