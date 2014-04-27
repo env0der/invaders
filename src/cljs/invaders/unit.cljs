@@ -1,7 +1,8 @@
 (ns invaders.client.unit
   (:require
    [invaders.client.state :as state]
-   [invaders.client.sprite :as sprite]))
+   [invaders.client.sprite :as sprite]
+   [invaders.client.stage :as stage]))
 
 (defn sprite-id [id]
   (str "unit:" id))
@@ -12,8 +13,15 @@
 (defn sprite-exists? [id]
   (not (nil? (get-sprite id))))
 
-(defb create-sprite [id texture-name]
-  (swap! state/ui assoc-in [:sprites (sprite-id id)] (sprite/create id texture-name)))
+(defn click [unit-sprite click-data]
+  (sprite/select unit-sprite))
+
+(defn create-sprite [id texture-name]
+  (let [sprite (sprite/create id texture-name)]
+    (swap! state/ui assoc-in [:sprites (sprite-id id)] sprite)
+    (stage/add-sprite-to-stage sprite)
+    (sprite/click sprite #(click sprite %))
+    sprite))
 
 (defn get-or-create-sprite [id texture-name]
   (when-not (sprite-exists? id) (create-sprite id texture-name))
@@ -25,3 +33,8 @@
 
 (defn tile [unit]
   (get (str "tile:" (:x unit) ":" (:y unit)) (:sprites @state/ui)))
+
+(defn move [unit x y]
+  (swap! state/game assoc-in [:units (.-unit-id unit) :x] x)
+  (swap! state/game assoc-in [:units (.-unit-id unit) :y] y)
+  (sprite/position unit x y))
