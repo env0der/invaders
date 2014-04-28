@@ -27,7 +27,9 @@
   (.addChild stage sprite))
 
 (defn update-world []
-  (let [tiles (state/game-map-to-grid state/game-map)
-        units (:units @state/game)]
+  (let [tiles (state/game-map-to-grid state/game-map) ;; this is order-dependent!
+        units (seq (:units @state/game))]
     (doseq [tile tiles]
-      (tile/render (str "tile:" (:x tile) ":" (:y tile)) tile))))
+      (tile/render (str "tile:" (:x tile) ":" (:y tile)) tile))
+    (doseq [id_unit units]
+      (unit/render (str "unit:" (first id_unit)) (last id_unit)))))

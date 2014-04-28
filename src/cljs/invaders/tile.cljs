@@ -2,6 +2,7 @@
   (:require
     [invaders.client.state :as state]
     [invaders.client.stage :as stage]
+    [invaders.client.unit :as unit]
     [invaders.client.sprite :as sprite]))
 
 (defn sprites []
@@ -35,9 +36,9 @@
       (sprite/hclear sprite))))
 
 (defn click [tile-sprite clickData]
-  (case (count (sprite/selected-type))
+  (case (count (sprite/selected))
     1 (sprite/select tile-sprite)
-    2 (let [selected (sprite/selected)]
+    2 (let [selected (first (sprite/selected))]
              (sprite/deselect)
              (unit/move selected (.-map-x tile-sprite) (.-map-y tile-sprite)))
     0 (sprite/select tile-sprite)))

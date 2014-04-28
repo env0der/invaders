@@ -18,9 +18,6 @@
 (defn selected []
   (:selected @state/ui))
 
-(defn selected-type []
-  (if-let [selected (selected)] (.-sprite-type selected) "nothing"))
-
 (defn select [sprite]
   (swap! state/ui assoc :selected
     (remove nil?
@@ -44,7 +41,7 @@
   (set! (.-click sprite) fun))
 
 (defn create [id texture-name]
-  (let [sprite (js/PIXI.Sprite. (texture-name textures/tiles-textures))]
+  (let [sprite (js/PIXI.Sprite. (texture-name textures/textures))]
     (set! (.-sprite-type sprite) (first (string/split id #":")))
     (set! (.-sprite-id sprite) id)
     (set! (.-interactive sprite) true)
