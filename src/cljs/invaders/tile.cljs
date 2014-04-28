@@ -30,13 +30,14 @@
 
 (defn render [id tile]
   (let [sprite (get-or-create-sprite id tile)]
-    ;; select logic
-    ))
+    (if (some #{sprite} (sprite/selected))
+      (sprite/hshade sprite)
+      (sprite/hclear sprite))))
 
 (defn click [tile-sprite clickData]
-  (case (sprite/selected-type)
-    "tile" (sprite/select tile-sprite)
-    "unit" (let [selected (sprite/selected)]
+  (case (count (sprite/selected-type))
+    1 (sprite/select tile-sprite)
+    2 (let [selected (sprite/selected)]
              (sprite/deselect)
              (unit/move selected (.-map-x tile-sprite) (.-map-y tile-sprite)))
-    "nothing" (sprite/select tile-sprite)))
+    0 (sprite/select tile-sprite)))

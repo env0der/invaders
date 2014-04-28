@@ -6,14 +6,14 @@
    [invaders.client.state :as state]
    [invaders.client.unit :as unit]))
 
-(defn tint [tile tint]
-  (set! (.-tint tile) tint))
+(defn tint [sprite tint]
+  (set! (.-tint sprite) tint))
 
-(defn hclear [tile]
-  (tint tile 0xFFFFFF))
+(defn hclear [sprite]
+  (tint sprite 0xFFFFFF))
 
-(defn hshade [tile]
-  (tint tile 0xBBBBBB))
+(defn hshade [sprite]
+  (tint sprite 0xBBBBBB))
 
 (defn selected []
   (:selected @state/ui))
