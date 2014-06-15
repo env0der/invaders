@@ -41,9 +41,12 @@
       (sprite/hshade sprite)
       (sprite/hclear sprite))))
 
-(defn tile [unit-sprite]
+(defn tile-id [unit-sprite]
   (let [unit (unit-from-sprite unit-sprite)]
-    (get-in @state/ui [:sprites (str "tile:" (:x unit) ":" (:y unit))])))
+    (str "tile:" (:x unit) ":" (:y unit))))
+
+(defn tile [unit-sprite]
+  (get-in @state/ui [:sprites (tile-id unit-sprite)]))
 
 (defn move [unit-sprite x y]
   (swap! state/game assoc-in [:units (unit-id (.-sprite-id unit-sprite)) :x] x)

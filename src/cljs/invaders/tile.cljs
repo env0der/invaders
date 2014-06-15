@@ -42,3 +42,16 @@
              (sprite/deselect)
              (unit/move selected (.-map-x tile-sprite) (.-map-y tile-sprite)))
     0 (sprite/select tile-sprite)))
+
+(defn unit-id [tile-sprite]
+  (let [x (.-map-x tile-sprite)
+        y (.-map-y tile-sprite)
+        u (filter #(and (= x (:x (last %)))
+                        (= y (:y (last %))))
+                  (seq (get @state/game :units)))]
+    (if (> (count u) 0)
+      (str "unit:" (first (first u))))))
+
+(defn unit [tile-sprite]
+  (when-let [unit-id (unit-id tile-sprite)]
+    (get-in @state/ui [:sprites unit-id])))

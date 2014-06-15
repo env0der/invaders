@@ -4,7 +4,8 @@
    [invaders.client.textures :as textures]
    [invaders.client.stage :as stage]
    [invaders.client.state :as state]
-   [invaders.client.unit :as unit]))
+   [invaders.client.unit :as unit]
+   [invaders.client.tile :as tile]))
 
 (defn tint [sprite tint]
   (set! (.-tint sprite) tint))
@@ -21,7 +22,9 @@
 (defn select [sprite]
   (swap! state/ui assoc :selected
     (remove nil?
-      (list sprite (if (= "unit" (.-sprite-type sprite)) (unit/tile sprite))))))
+      (case (.-sprite-type sprite)
+        "tile" (list (tile/unit sprite) sprite)
+        "unit" (list sprite (unit/tile sprite))))))
 
 (defn deselect []
   (swap! state/ui assoc :selected (list)))
@@ -45,4 +48,10 @@
     (set! (.-sprite-type sprite) (first (string/split id #":")))
     (set! (.-sprite-id sprite) id)
     (set! (.-interactive sprite) true)
+    (if-let [hit-area (texture-name textures/hit-areas)]
+      (do
+        (.log js/console hit-area)
+        (set! (.-hitArea sprite)
+              (js/PIXI.Polygon. hit-area)))
+      )
     sprite))
