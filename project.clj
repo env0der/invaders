@@ -21,4 +21,7 @@
                            :optimizations :none
                            :pretty-print true
                            :source-map true}}]}
+  :profiles {:dev
+             {:dependencies
+              [[javax.servlet/servlet-api "2.5"]]}}
   :main invaders.handler)
