@@ -1,4 +1,7 @@
-(ns invaders.client.main)
+(ns invaders.client.main
+  :require [invaders.client.components]
+  [brute.entity :as entity]
+  [brute.system :as system])
 
 (def stage (js/PIXI.Stage. 0xE3FCFF))
 (def renderer (js/PIXI.autoDetectRenderer (.-innerWidth js/window) (.-innerHeight js/window)))
@@ -12,6 +15,16 @@
 (.appendChild (.-body js/document) (.-view renderer))
 (.appendChild (.-body js/document) (.-domElement stats))
 
+(defn rendering-system [])
+
+(defn start [system]
+  (let [player (entity/create-entity)]
+    (-> system
+        (entity/add-entity player)
+        (entity/add-component player (components/->Position 100 100))
+        (entity/add-component player (components/->Drawable (js/PIXI.Texture.fromImage "/images/marsman.png")))))
+  )
+
 (defn render-stage []
   (js/requestAnimFrame render-stage)
   (.begin stats)
@@ -19,4 +32,8 @@
   (.end stats)
   (. renderer render stage))
 
+(defn update []
+  )
+
+(start (entity/create-system))
 (render-stage)
