@@ -15,14 +15,31 @@
 (.appendChild (.-body js/document) (.-view renderer))
 (.appendChild (.-body js/document) (.-domElement stats))
 
-(defn rendering-system [])
+(defn stage-entity [system entity]
+  (let [drawable (entity/get-component system entity Drawable)
+        position (entity/get-component system entity Position)
+        sprite (js/PIXI.Sprite. (:image drawable))]
+    (set! (.-position.x sprite) (:x position))
+    (set! (.-position.y sprite) (:y position))
+    (.addChild stage sprite)
+    sprite))
+
+(defn stage-all [system delta]
+  (let [entities (intersection
+                    (entity/get-all-entities-with-component system Drawable)
+                    (entity/get-all-entities-with-component system Position))]
+    (->> entities
+         (filter #(nil? (get-in system [:staged %])))
+         (map #(stage-entity system %))
+         (reduce #(assoc-in %1 [:staged %2]) system))))
 
 (defn start [system]
   (let [player (entity/create-entity)]
     (-> system
         (entity/add-entity player)
         (entity/add-component player (components/->Position 100 100))
-        (entity/add-component player (components/->Drawable (js/PIXI.Texture.fromImage "/images/marsman.png")))))
+        (entity/add-component player (components/->Drawable (js/PIXI.Texture.fromImage "/images/marsman.png")))
+        (system/add-system-fn stage-all)))
   )
 
 (defn render-stage []
