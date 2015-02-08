@@ -10,7 +10,6 @@
                  [http-kit "2.1.18"]
                  [ring.middleware.logger "0.5.0"]
                  [hiccup "1.0.5"]
-                 [com.novemberain/monger "2.0.1"]
                  [prismatic/dommy "1.0.0"]]
   :plugins [[lein-cljsbuild "1.0.4"] [lein-pdo "0.1.1"]]
   :aliases {"up" ["pdo" "cljsbuild" "auto," "run" "-dev"]}
