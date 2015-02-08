@@ -2,17 +2,17 @@
   :description "FIXME: write description"
   :url "http://example.com/FIXME"
   :source-paths ["src/clj" "src/cljs"]
-  :dependencies [[org.clojure/clojure "1.5.1"]
-                 [org.clojure/clojurescript "0.0-2173"]
-                 [compojure "1.1.6"]
-                 [ring/ring-devel "1.1.8"]
-                 [ring/ring-core "1.1.8"]
-                 [http-kit "2.0.0"]
-                 [ring.middleware.logger "0.4.0"]
+  :dependencies [[org.clojure/clojure "1.6.0"]
+                 [org.clojure/clojurescript "0.0-2760"]
+                 [compojure "1.3.1"]
+                 [ring/ring-devel "1.3.2"]
+                 [ring/ring-core "1.3.2"]
+                 [http-kit "2.1.18"]
+                 [ring.middleware.logger "0.5.0"]
                  [hiccup "1.0.5"]
-                 [com.novemberain/monger "1.7.0"]
-                 [prismatic/dommy "0.1.2"]]
-  :plugins [[lein-cljsbuild "1.0.0"] [lein-pdo "0.1.1"]]
+                 [com.novemberain/monger "2.0.1"]
+                 [prismatic/dommy "1.0.0"]]
+  :plugins [[lein-cljsbuild "1.0.4"] [lein-pdo "0.1.1"]]
   :aliases {"up" ["pdo" "cljsbuild" "auto," "run" "-dev"]}
   :cljsbuild {:builds
               [{:source-paths ["src/cljs"]
@@ -21,6 +21,4 @@
                            :optimizations :none
                            :pretty-print true
                            :source-map true}}]}
-  :profiles
-  {:dev {:dependencies [[ring-mock "0.1.5"]]}}
   :main invaders.handler)
