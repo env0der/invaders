@@ -1,10 +1,17 @@
 (ns invaders.client.main
-  :require [invaders.client.components]
-  [brute.entity :as entity]
-  [brute.system :as system])
+  (:require
+   [invaders.client.components :as components]
+   [brute.entity :as entity]
+   [brute.system :as system]
+   [clojure.set :as set]))
 
 (def stage (js/PIXI.Stage. 0xE3FCFF))
 (def renderer (js/PIXI.autoDetectRenderer (.-innerWidth js/window) (.-innerHeight js/window)))
+(def sys (atom 0))
+(def lastTime (atom (.getTime (js/Date.))))
+
+(defn log [& items]
+  (.log js/console (apply str items)))
 
 (def stats (js/Stats.))
 (set! (-> (.-domElement stats) .-style .-position) "absolute")
@@ -25,7 +32,7 @@
     sprite))
 
 (defn stage-all [system delta]
-  (let [entities (intersection
+  (let [entities (set/intersection
                     (entity/get-all-entities-with-component system Drawable)
                     (entity/get-all-entities-with-component system Position))]
     (->> entities
@@ -37,7 +44,7 @@
   (let [player (entity/create-entity)]
     (-> system
         (entity/add-entity player)
-        (entity/add-component player (components/->Position 100 100))
+        (entity/add-component player (components/->Position 500 500))
         (entity/add-component player (components/->Drawable (js/PIXI.Texture.fromImage "/images/marsman.png")))
         (system/add-system-fn stage-all)))
   )
@@ -45,12 +52,13 @@
 (defn render-stage []
   (js/requestAnimFrame render-stage)
   (.begin stats)
-  (update)
+  (let [time (.getTime (js/Date.))
+        delta (- time @lastTime)]
+    (reset! lastTime time)
+    (reset! sys (system/process-one-game-tick @sys delta) ))
   (.end stats)
   (. renderer render stage))
 
-(defn update []
-  )
 
-(start (entity/create-system))
+(reset! sys (start (entity/create-system)))
 (render-stage)
