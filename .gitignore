@@ -15,3 +15,4 @@ pom.xml.asc
 /resources/public/js/build/*
 /out
 /repl
+/TAGS
