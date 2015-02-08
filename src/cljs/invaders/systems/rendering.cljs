@@ -7,20 +7,17 @@
 (defn stage-drawable-entity [system entity]
   (let [drawable (entity/get-component system entity components/Drawable)
         position (entity/get-component system entity components/Position)
-        sprite (js/PIXI.Sprite. (:image drawable))]
-    (set! (.-position.x sprite) (:x position))
-    (set! (.-position.y sprite) (:y position))
+        sprite (stage/create-sprite (:image drawable) (:x position) (:y position))]
     (stage/add-child sprite)
-    [entity sprite]))
+    (update-in system [:staged] merge {entity sprite})))
 
-(defn stage-not-staged-drawables [system delta]
+(defn stage-not-staged-drawables [system]
   (let [entities (set/intersection
                   (set (entity/get-all-entities-with-component system components/Drawable))
                   (set (entity/get-all-entities-with-component system components/Position)))]
     (->> entities
          (filter #(nil? (get-in system [:staged %])))
-         (map #(stage-drawable-entity system %))
-         (reduce #(assoc-in %1 [:staged (first %2)] (second %2)) system))))
+         (reduce stage-drawable-entity system))))
 
-(defn process-one-game-tick [system delta]
-  (stage-not-staged-drawables system delta))
+(defn process-one-game-tick [system time-delta]
+  (stage-not-staged-drawables system))

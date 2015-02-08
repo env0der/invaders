@@ -15,7 +15,7 @@
     (-> system
         (entity/add-entity invader)
         (entity/add-component invader (components/->Position 500 500))
-        (entity/add-component invader (components/->Drawable (js/PIXI.Texture.fromImage "/images/marsman.png")))
+        (entity/add-component invader (components/->Drawable "/images/marsman.png"))
         (system/add-system-fn rendering-system/process-one-game-tick))))
 
 
