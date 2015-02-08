@@ -1,9 +1,12 @@
 (ns invaders.client.main
   (:require
+   [clojure.browser.repl :as repl]
    [invaders.client.components :as components]
    [brute.entity :as entity]
    [brute.system :as system]
    [clojure.set :as set]))
+
+(repl/connect "http://localhost:9000/repl")
 
 (def stage (js/PIXI.Stage. 0xE3FCFF))
 (def renderer (js/PIXI.autoDetectRenderer (.-innerWidth js/window) (.-innerHeight js/window)))
@@ -23,22 +26,22 @@
 (.appendChild (.-body js/document) (.-domElement stats))
 
 (defn stage-entity [system entity]
-  (let [drawable (entity/get-component system entity Drawable)
-        position (entity/get-component system entity Position)
+  (let [drawable (entity/get-component system entity components/Drawable)
+        position (entity/get-component system entity components/Position)
         sprite (js/PIXI.Sprite. (:image drawable))]
     (set! (.-position.x sprite) (:x position))
     (set! (.-position.y sprite) (:y position))
     (.addChild stage sprite)
-    sprite))
+    [entity sprite]))
 
 (defn stage-all [system delta]
   (let [entities (set/intersection
-                    (entity/get-all-entities-with-component system Drawable)
-                    (entity/get-all-entities-with-component system Position))]
+                  (set (entity/get-all-entities-with-component system components/Drawable))
+                  (set (entity/get-all-entities-with-component system components/Position)))]
     (->> entities
          (filter #(nil? (get-in system [:staged %])))
          (map #(stage-entity system %))
-         (reduce #(assoc-in %1 [:staged %2]) system))))
+         (reduce #(assoc-in %1 [:staged (first %2)] (second %2)) system))))
 
 (defn start [system]
   (let [player (entity/create-entity)]
@@ -61,4 +64,5 @@
 
 
 (reset! sys (start (entity/create-system)))
+;; (log @sys)
 (render-stage)
