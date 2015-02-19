@@ -34,6 +34,9 @@
     (set! (.-position.y sprite) y)
     sprite))
 
+(defn create-container []
+  (js/PIXI.DisplayObjectContainer.))
+
 (defn add-child [sprite]
   (.addChild stage sprite))
 
