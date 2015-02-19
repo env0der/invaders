@@ -6,18 +6,24 @@
    [brute.system :as system]
    [invaders.stage :as stage]
    [invaders.components :as components]
-   [invaders.systems.rendering :as rendering-system]
-   )
-  )
+   [invaders.systems.rendering :as rendering-system]))
+
+(defn create-invader [system x y image]
+  (-> system
+      (entity/add-entity invader)
+      (entity/add-component invader (components/->Position x y))
+      (entity/add-component invader (components/->Drawable image))))
+
+(defn create-map [system]
+  system)
 
 ;; (repl/connect "http://localhost:9000/repl")
 
 (defn init-system [system]
   (let [invader (entity/create-entity)]
     (-> system
-        (entity/add-entity invader)
-        (entity/add-component invader (components/->Position 500 500))
-        (entity/add-component invader (components/->Drawable "/images/marsman.png"))
+        (create-map)
+        (create-invader 500 500 "/images/marsman.png")
         (system/add-system-fn rendering-system/process-one-game-tick))))
 
 
