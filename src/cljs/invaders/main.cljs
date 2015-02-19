@@ -1,12 +1,14 @@
-(ns invaders.client.main
-  (:use [invaders.client.logging :only [log]])
+(ns invaders.main
+  (:use [invaders.logging :only [log]])
   (:require
    [clojure.browser.repl :as repl]
    [brute.entity :as entity]
    [brute.system :as system]
-   [invaders.client.stage :as stage]
-   [invaders.client.components :as components]
-   [invaders.client.systems.rendering :as rendering-system]))
+   [invaders.stage :as stage]
+   [invaders.components :as components]
+   [invaders.systems.rendering :as rendering-system]
+   )
+  )
 
 ;; (repl/connect "http://localhost:9000/repl")
 

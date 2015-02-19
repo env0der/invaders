@@ -1,7 +1,7 @@
-(ns invaders.client.systems.rendering
-  (:require [invaders.client.components :as components]
+(ns invaders.systems.rendering
+  (:require [invaders.components :as components]
             [brute.entity :as entity]
-            [invaders.client.stage :as stage]
+            [invaders.stage :as stage]
             [clojure.set :as set]))
 
 (defn stage-drawable-entity [system entity]

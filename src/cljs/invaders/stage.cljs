@@ -1,4 +1,4 @@
-(ns invaders.client.stage)
+(ns invaders.stage)
 
 (def stage (js/PIXI.Stage. 0xE3FCFF))
 (def renderer (js/PIXI.autoDetectRenderer (.-innerWidth js/window) (.-innerHeight js/window)))

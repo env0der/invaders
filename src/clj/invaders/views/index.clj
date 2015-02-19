@@ -8,4 +8,4 @@
                  [:script {:src "js/vendor/stats.js"}]
                  [:script {:src "js/build/goog/base.js"}]
                  [:script {:src "js/build/invaders.js"}]
-                 [:script "goog.require('invaders.client.main');"]))
+                 [:script "goog.require('invaders.main');"]))
